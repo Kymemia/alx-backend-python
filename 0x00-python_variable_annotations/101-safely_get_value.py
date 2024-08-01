@@ -4,6 +4,7 @@
 adding type notations to the function
 """
 from typing import TypeVar, Mapping, Union, Any
+
 T = TypeVar('T')
 
 
