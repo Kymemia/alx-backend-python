@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 """
+coroutine <measure_runtime> that executes <async_comrehension>
+four times in parallel using <asyncio.gather>
+measure_runtime measures the total runtime and returns it
 """
 import time
 import asyncio
