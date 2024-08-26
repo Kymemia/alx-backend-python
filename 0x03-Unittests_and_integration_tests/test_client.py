@@ -4,7 +4,7 @@
 test_case for client.py file
 """
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, PropertyMock
 from parameterized import parameterized
 from typing import Dict
 from client import GithubOrgClient
@@ -29,6 +29,22 @@ class TestGithubOrgClient(unittest.TestCase):
         mock_get_json.assert_called_once_with(
                 f"https://api.github.com/orgs/{org_name}"
                 )
+
+    def test_public_repos_url(self):
+        """
+        this is a test that returns the required URL
+        """
+        with patch.object(
+                GithubOrgClient, 'org',
+                new_callable=PropertyMock
+                ) as mock_org:
+            mock_org.return_value = {
+                    "repos_url": "https://api.github.com/orgs/google/repos"
+                    }
+            client = GithubOrgClient("google")
+            result = client._public_repos_url
+            expected_result = "https://api.github.com/orgs/google/repos"
+            self.assertEqual(result, expected_result)
 
 
 if __name__ == "__main__":
