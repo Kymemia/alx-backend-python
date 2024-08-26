@@ -4,10 +4,28 @@
 testcase for utils.access_nested_map
 """
 import unittest
-from typing import Mapping, Sequence, Any, Dict
+from typing import Mapping, Sequence, Any, Dict, Callable
 from parameterized import parameterized
 from utils import access_nested_map, get_json
 from unittest.mock import patch, Mock
+
+
+def memoize(fn: Callable) -> Callable:
+    """
+    this is a decorator that memoizes a method
+    """
+    attr_name = f"_{fn.__name__}"
+
+    def wrapper(self):
+        """
+        this is a function
+        that implements the caching system
+        """
+        if not hasattr(self, attr_name):
+            setattr(self, attr_name, fn(self))
+        return getattr(self, attr_name)
+
+    return wrapper
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -66,6 +84,45 @@ class TestGetJson(unittest.TestCase):
         result = get_json(test_url)
         mock_get.assert_called_once_with(test_url)
         self.assertEqual(result, test_payload)
+
+
+class TestMemoize(unittest.TestCase):
+    """
+    class definition for the test case
+    for the memoize decorator
+    """
+    def test_memoize(self):
+        """
+        method definition that'll test
+        the memoize decorator.
+        """
+        class TestClass:
+            """
+            class definition to test memoization
+            """
+            def a_method(self):
+                """
+                method definition that returns the integer 42
+                """
+                return 42
+
+            @memoize
+            def a_property(self):
+                """
+                method definition that'll cache the result
+                """
+                return self.a_method()
+
+        obj = TestClass()
+
+        with patch.object(obj, 'a_method', return_value=42) as mock_method:
+            result_a = obj.a_property()
+            result_b = obj.a_property()
+
+            self.assertEqual(result_a, 42)
+            self.assertEqual(result_b, 42)
+
+            mock_method.assert_called_once()
 
 
 if __name__ == "__main__":
